@@ -8,35 +8,49 @@
 import SwiftUI
 
 struct VideoListItem: View {
+    @Environment(\.openURL) private var openURL
+    let video: Video
+    
     var body: some View {
         HStack(spacing: 10) {
             ZStack {
-                // Replace with thumbnail
-                Image(systemName: "photo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 80)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .foregroundStyle(.blue)
+                AsyncImage(url: video.image) { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 80)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    
+                } placeholder: {
+                    Image(systemName: "video.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 80)
+                        .foregroundStyle(.gray)
+                }
                 
                 Image(systemName: "play.circle")
                     .resizable()
                     .scaledToFit()
                     .frame(height: 32)
                     .shadow(radius: 4)
+                    .foregroundStyle(.white)
                 
-                Text("11:40")
-                    .foregroundStyle(.red)
-                    .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/, height: 80, alignment: .bottomTrailing)
+                Text(video.duration.formatedDuration())
+                    .foregroundStyle(.white)
+                    .frame(width: 150, height: 80, alignment: .topLeading)
             }
             
             VStack(alignment: .leading, spacing: 10) {
-                Text("video title")
+                Text(video.user.name)
                     .font(.title2)
                     .fontWeight(.heavy)
                     .foregroundStyle(Color.accentColor)
                 
-                Text("video description that can take up to 2 lines but no more because then the text will be truncated")
+                Text("You can check my profile in the link below [\(video.user.url.lastPathComponent)](\(video.user.url.absoluteString))")
+                    .environment(\.openURL, OpenURLAction { url in
+                        return .systemAction(url)
+                    })
                     .font(.footnote)
                     .multilineTextAlignment(.leading)
                     .lineLimit(2, reservesSpace: true)
@@ -47,5 +61,5 @@ struct VideoListItem: View {
 }
 
 #Preview {
-    VideoListItem()
+    VideoListItem(video: Video.testVideo)
 }
