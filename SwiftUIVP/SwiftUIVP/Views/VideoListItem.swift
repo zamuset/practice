@@ -62,4 +62,6 @@ struct VideoListItem: View {
 
 #Preview {
     VideoListItem(video: Video.testVideo)
+        .previewLayout(.sizeThatFits)
+        .padding()
 }

@@ -15,9 +15,31 @@ struct ContentView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
         animation: .default)
     private var items: FetchedResults<Item>
-
+    
+    @State var videos: [Video] = [Video.testVideo]
+    
     var body: some View {
-        VideoListItem(video: .testVideo)
+        NavigationView {
+            List {
+                ForEach(videos) { video in
+                    NavigationLink(destination: Text("\(video.id)")) {
+                        VideoListItem(video: video)
+                            .padding(.vertical, 8)
+                    }
+                } // Loop
+            } // List
+            .listStyle(.insetGrouped)
+            .navigationTitle("Videos")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        videos.shuffle()
+                    } label: {
+                        Image(systemName: "shuffle")
+                    }
+                }
+            }
+        } // Navigation
     }
 
     private func addItem() {
