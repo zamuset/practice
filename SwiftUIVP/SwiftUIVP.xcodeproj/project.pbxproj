@@ -16,6 +16,7 @@
 		F8981FB92C1FB234002B85D8 /* SwiftUIVPTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8981FB82C1FB234002B85D8 /* SwiftUIVPTests.swift */; };
 		F8981FC32C1FB234002B85D8 /* SwiftUIVPUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8981FC22C1FB234002B85D8 /* SwiftUIVPUITests.swift */; };
 		F8981FC52C1FB234002B85D8 /* SwiftUIVPUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8981FC42C1FB234002B85D8 /* SwiftUIVPUITestsLaunchTests.swift */; };
+		F8981FD52C21084E002B85D8 /* VideoListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8981FD42C21084E002B85D8 /* VideoListItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		F8981FBE2C1FB234002B85D8 /* SwiftUIVPUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftUIVPUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8981FC22C1FB234002B85D8 /* SwiftUIVPUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIVPUITests.swift; sourceTree = "<group>"; };
 		F8981FC42C1FB234002B85D8 /* SwiftUIVPUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIVPUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		F8981FD42C21084E002B85D8 /* VideoListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoListItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,8 +100,9 @@
 		F8981FA12C1FB233002B85D8 /* SwiftUIVP */ = {
 			isa = PBXGroup;
 			children = (
-				F8981FA22C1FB233002B85D8 /* SwiftUIVPApp.swift */,
-				F8981FA42C1FB233002B85D8 /* ContentView.swift */,
+				F8981FD32C2107FF002B85D8 /* App */,
+				F8981FD22C2107EF002B85D8 /* Model */,
+				F8981FD12C2107E7002B85D8 /* Views */,
 				F8981FA62C1FB234002B85D8 /* Assets.xcassets */,
 				F8981FAB2C1FB234002B85D8 /* Persistence.swift */,
 				F8981FAD2C1FB234002B85D8 /* SwiftUIVP.xcdatamodeld */,
@@ -131,6 +134,30 @@
 				F8981FC42C1FB234002B85D8 /* SwiftUIVPUITestsLaunchTests.swift */,
 			);
 			path = SwiftUIVPUITests;
+			sourceTree = "<group>";
+		};
+		F8981FD12C2107E7002B85D8 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F8981FA42C1FB233002B85D8 /* ContentView.swift */,
+				F8981FD42C21084E002B85D8 /* VideoListItem.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		F8981FD22C2107EF002B85D8 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		F8981FD32C2107FF002B85D8 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				F8981FA22C1FB233002B85D8 /* SwiftUIVPApp.swift */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -263,6 +290,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F8981FD52C21084E002B85D8 /* VideoListItem.swift in Sources */,
 				F8981FAC2C1FB234002B85D8 /* Persistence.swift in Sources */,
 				F8981FA52C1FB233002B85D8 /* ContentView.swift in Sources */,
 				F8981FA32C1FB233002B85D8 /* SwiftUIVPApp.swift in Sources */,
