@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct VideoListItem: View {
-    @Environment(\.openURL) private var openURL
     let video: Video
     
     var body: some View {
@@ -17,17 +16,13 @@ struct VideoListItem: View {
                 AsyncImage(url: video.image) { image in
                     image
                         .resizable()
-                        .scaledToFit()
-                        .frame(height: 80)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .aspectRatio(contentMode: .fit)
                     
                 } placeholder: {
-                    Image(systemName: "video.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 80)
-                        .foregroundStyle(.gray)
+                    ProgressView()
                 }
+                .frame(maxWidth: 300, maxHeight: 100)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
                 
                 Image(systemName: "play.circle")
                     .resizable()
@@ -35,13 +30,10 @@ struct VideoListItem: View {
                     .frame(height: 32)
                     .shadow(radius: 4)
                     .foregroundStyle(.white)
-                
-                Text(video.duration.formatedDuration())
-                    .foregroundStyle(.white)
-                    .frame(width: 150, height: 80, alignment: .topLeading)
             }
             
             VStack(alignment: .leading, spacing: 10) {
+                
                 Text(video.user.name)
                     .font(.title2)
                     .fontWeight(.heavy)
@@ -51,11 +43,14 @@ struct VideoListItem: View {
                     .environment(\.openURL, OpenURLAction { url in
                         return .systemAction(url)
                     })
-                    .font(.footnote)
+                    .font(.subheadline)
                     .multilineTextAlignment(.leading)
-                    .lineLimit(2, reservesSpace: true)
+                    .lineLimit(3, reservesSpace: true)
+                
+                Text(video.duration.formatedDuration())
+                    .foregroundStyle(Color.accentColor)
+                    .font(.footnote)
             }
-            
         }
     }
 }
