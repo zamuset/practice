@@ -24,6 +24,22 @@ struct VideoDetailView: View {
     @ViewBuilder
     private var videoView: some View {
         VideoPlayer(player: player) {
+            VStack {
+                HStack {
+                    Spacer()
+                    let imageName = showFullScreen ?
+                        "arrow.down.right.and.arrow.up.left" :
+                        "arrow.up.left.and.arrow.down.right"
+                    Image(systemName: imageName)
+                        .padding(16)
+                        .foregroundStyle(.white)
+                        .tint(.white)
+                        .onTapGesture {
+                            showFullScreen.toggle()
+                        }
+                }
+                Spacer()
+            }
         }
         .onAppear {
             if let sdVideo = video.videoFiles.first(where: { $0.quality == "sd" }) {
