@@ -1,5 +1,5 @@
 //
-//  VideoListItem.swift
+//  VideoItem.swift
 //  SwiftUIVP
 //
 //  Created by Samuel Chavez on 17/06/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct VideoListItem: View {
+struct VideoItem: View {
     let video: Video
     
     var body: some View {
@@ -56,7 +56,7 @@ struct VideoListItem: View {
 }
 
 #Preview {
-    VideoListItem(video: Video.testVideo)
+    VideoItem(video: Video.testVideo)
         .previewLayout(.sizeThatFits)
         .padding()
 }

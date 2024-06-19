@@ -14,8 +14,8 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             List(viewModel.videos) { video in
-                NavigationLink(destination: Text("\(video.id)")) {
-                    VideoListItem(video: video)
+                NavigationLink(destination: VideoDetailView(video: video)) {
+                    VideoItem(video: video)
                         .padding(.vertical, 8)
                 }
             } // List
