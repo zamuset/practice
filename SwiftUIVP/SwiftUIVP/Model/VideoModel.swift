@@ -25,7 +25,7 @@ struct User: Decodable {
     let url: URL
 }
 
-struct VideoFile: Decodable {
+struct VideoFile: Decodable, Identifiable {
     let id: Int
     let quality: String
     let fileType: String
@@ -34,7 +34,7 @@ struct VideoFile: Decodable {
     let link: URL
 }
 
-struct VideoPicture: Decodable {
+struct VideoPicture: Decodable, Identifiable {
     let id: Int
     let picture: URL
     let nr: Int
@@ -50,17 +50,29 @@ extension Video {
                      duration: 2234,
                      user: .init(id: 123, name: "Test user", url: URL(string: "https://www.pexels.com/@joey")!),
                      videoFiles: [
-                        .init(id: 456, 
-                              quality: "sd",
-                              fileType: "video/mp4", 
-                              width: 360,
-                              height: 640,
-                              link: URL(string: "https://player.vimeo.com/external/342571552.sd.mp4?s=e0df43853c25598dfd0ec4d3f413bce1e002deef&profile_id=164&oauth2_token_id=57447761")!)
+                        VideoFile.testVideoFile
                      ],
                      videoPictures: [
-                        .init(id: 789, 
-                              picture: URL(string: "https://static-videos.pexels.com/videos/2499611/pictures/preview-0.jpg")!,
-                              nr: 0)
+                        VideoPicture.testVideoPicture
                      ])
+    }
+}
+
+extension VideoFile {
+    static var testVideoFile: VideoFile {
+        return .init(id: 456,
+                     quality: "sd",
+                     fileType: "video/mp4",
+                     width: 360,
+                     height: 640,
+                     link: URL(string: "https://player.vimeo.com/external/342571552.sd.mp4?s=e0df43853c25598dfd0ec4d3f413bce1e002deef&profile_id=164&oauth2_token_id=57447761")!)
+    }
+}
+
+extension VideoPicture {
+    static var testVideoPicture: VideoPicture {
+        return .init(id: 789,
+                     picture: URL(string: "https://static-videos.pexels.com/videos/2499611/pictures/preview-0.jpg")!,
+                     nr: 0)
     }
 }

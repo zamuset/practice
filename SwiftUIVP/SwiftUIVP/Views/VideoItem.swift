@@ -11,7 +11,7 @@ struct VideoItem: View {
     let video: Video
     
     var body: some View {
-        HStack(spacing: 10) {
+        VStack(spacing: 10) {
             ZStack {
                 AsyncImage(url: video.image) { image in
                     image
@@ -21,7 +21,7 @@ struct VideoItem: View {
                 } placeholder: {
                     ProgressView()
                 }
-                .frame(maxWidth: 300, maxHeight: 100)
+                .frame(maxWidth: 400, maxHeight: 100)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 
                 Image(systemName: "play.circle")
@@ -30,7 +30,17 @@ struct VideoItem: View {
                     .frame(height: 32)
                     .shadow(radius: 4)
                     .foregroundStyle(.white)
+                
             }
+            .overlay(
+                Text(video.duration.formatedDuration())
+                    .padding(.horizontal, 2)
+                    .background(.black.opacity(0.5))
+                    .foregroundStyle(.white)
+                    .font(.footnote)
+                    .fontWeight(.light),
+                alignment: .bottomTrailing
+            )
             
             VStack(alignment: .leading, spacing: 10) {
                 
@@ -39,17 +49,10 @@ struct VideoItem: View {
                     .fontWeight(.heavy)
                     .foregroundStyle(Color.accentColor)
                 
-                Text("You can check my profile in the link below [\(video.user.url.lastPathComponent)](\(video.user.url.absoluteString))")
-                    .environment(\.openURL, OpenURLAction { url in
-                        return .systemAction(url)
-                    })
+                Text("You can check my profile in the link below \n [\(video.user.url.lastPathComponent)](\(video.user.url.absoluteString))")
                     .font(.subheadline)
                     .multilineTextAlignment(.leading)
                     .lineLimit(3, reservesSpace: true)
-                
-                Text(video.duration.formatedDuration())
-                    .foregroundStyle(Color.accentColor)
-                    .font(.footnote)
             }
         }
     }
