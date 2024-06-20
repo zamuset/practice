@@ -3,7 +3,7 @@
     <entity name="SavedVideo" representedClassName="SavedVideo" syncable="YES">
         <attribute name="author" optional="YES" attributeType="String"/>
         <attribute name="authorInfo" optional="YES" attributeType="String"/>
-        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
         <attribute name="localPath" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
     </entity>

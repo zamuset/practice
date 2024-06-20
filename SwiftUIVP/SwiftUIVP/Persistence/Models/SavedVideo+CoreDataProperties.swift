@@ -16,7 +16,7 @@ extension SavedVideo {
         return NSFetchRequest<SavedVideo>(entityName: "SavedVideo")
     }
 
-    @NSManaged public var id: UUID?
+    @NSManaged public var id: String?
     @NSManaged public var localPath: String?
     @NSManaged public var name: String?
     @NSManaged public var author: String?

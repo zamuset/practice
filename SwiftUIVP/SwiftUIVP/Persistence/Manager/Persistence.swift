@@ -36,3 +36,4 @@ extension NSPersistentStoreDescription {
             .replacingOccurrences(of: "%20", with: "\\ ")
     }
 }
+

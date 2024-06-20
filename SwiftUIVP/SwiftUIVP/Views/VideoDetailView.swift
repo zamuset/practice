@@ -13,6 +13,7 @@ struct VideoDetailView: View {
     @State var player = AVPlayer()
     @State var showFullScreen = false
     @State var currentPlayingVideo: VideoFile = .testVideoFile
+    @State var savedVideo: SavedVideo? = nil
     @ObservedObject var viewModel: ViewModel
     let video: Video
     
@@ -24,57 +25,65 @@ struct VideoDetailView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                
-            Text("This video ID is \(currentPlayingVideo.id)")
-                .foregroundStyle(.accent)
-                .font(.headline)
-                .padding(.horizontal, 8)
-                Spacer()
-                
-                Button(action: {
-                    viewModel.downloadVideo(
-                        url: currentPlayingVideo.link,
-                        authorInfo: (user: video.user.name, 
-                                     description: video.user.url.absoluteString)
-                    )
-                }, label: {
-                    Text("Download")
-                    Image(systemName: "square.and.arrow.down")
+        ZStack {
+            VStack(alignment: .leading) {
+                HStack {
+                    Text("This video ID is \(currentPlayingVideo.id)")
+                        .foregroundStyle(.accent)
+                        .font(.headline)
+                        .padding(.horizontal, 12)
+                    Spacer()
                     
-                })
+                    if savedVideo != nil {
+                        Button(action: {
+                            Task {
+                                try await viewModel.removeVideo(with: savedVideo?.id ?? "")
+                            }
+                        }, label: {
+                            Text("Delete")
+                            Image(systemName: "trash")
+                        })
+                        .foregroundStyle(.red)
+                    } else {
+                        Button(action: {
+                            viewModel.downloadVideo(currentPlayingVideo,
+                                                    authorInfo: (name: video.user.name,
+                                                                 siteLink: video.user.url.absoluteString)
+                            )
+                        }, label: {
+                            Text("Download")
+                            Image(systemName: "square.and.arrow.down")
+                            
+                        })
+                    }
+                }
+                .padding(.horizontal, 8)
+                
+                videoView
+                    .frame(height: 350)
+                
+                Picker(selection: $selection, label: Text("Test")) {
+                    Text("Other videos").tag(0)
+                    Text("Pictures").tag(1)
+                }
+                .pickerStyle(.segmented)
+                .background(.green.opacity(0.5))
+                
+                switch selection {
+                case 1:
+                    VideoPicturesView(videoPictures: video.videoPictures)
+                default:
+                    Text("View one")
+                }
+                Spacer()
             }
-            .padding(.horizontal, 8)
+            .fullScreenCover(isPresented: $showFullScreen, content: {
+                videoView
+                    .ignoresSafeArea(.all)
+            })
             
-            videoView
-                .frame(height: 350)
-            
-            Picker(selection: $selection, label: Text("Test")) {
-                Text("Other videos").tag(0)
-                Text("Pictures").tag(1)
-            }
-            .pickerStyle(.segmented)
-            .background(.green.opacity(0.5))
-            
-            switch selection {
-            case 1:
-                VideoPicturesView(videoPictures: video.videoPictures)
-            default:
-                Text("View one")
-            }
-            Spacer()
-            
-        }
-        .fullScreenCover(isPresented: $showFullScreen, content: {
-            videoView
-                .ignoresSafeArea(.all)
-        })
-        .onAppear {
-            if let sdVideo = video.videoFiles.first(where: { $0.quality == "sd" }) {
-                currentPlayingVideo = sdVideo
-                player = AVPlayer(url: sdVideo.link)
-                player.play()
+            if viewModel.isDownloading {
+                LoaderView()
             }
         }
     }
@@ -114,9 +123,19 @@ struct VideoDetailView: View {
                 player = AVPlayer(url: sdVideo.link)
                 player.play()
             }
+            
         }
         .onDisappear {
             player.pause()
+        }
+        .task {
+            if let sdVideo = video.videoFiles.first(where: { $0.quality == "sd" }) {
+                do {
+                    savedVideo = try await viewModel.checkIfVideoExist(with: "\(sdVideo.id)")
+                } catch {
+                    debugPrint(error.localizedDescription)
+                }
+            }
         }
     }
 }

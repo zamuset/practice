@@ -11,7 +11,7 @@ import SwiftUI
 struct SwiftUIVPApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView(context: PersistenceController.shared.container.viewContext)
+            MainView()
         }
     }
 }

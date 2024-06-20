@@ -1,14 +1,14 @@
 //
-//  ContentView.swift
+//  VideoListView.swift
 //  SwiftUIVP
 //
-//  Created by Samuel Chavez on 16/06/24.
+//  Created by Samuel Chavez on 20/06/24.
 //
 
 import SwiftUI
 import CoreData
 
-struct ContentView: View {
+struct VideoListView: View {
     private var viewContext: NSManagedObjectContext
     @ObservedObject var viewModel: ViewModel
     @State private var animateGradient: Bool = false
@@ -58,5 +58,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView(context: PersistenceController.shared.container.viewContext).environment(\.managedObjectContext, PersistenceController.shared.container.viewContext)
+    VideoListView(context: PersistenceController.shared.container.viewContext)
 }
