@@ -9,19 +9,29 @@ import SwiftUI
 import CoreData
 
 struct ContentView: View {
-    @ObservedObject var viewModel = ViewModel()
+    private var viewContext: NSManagedObjectContext
+    @ObservedObject var viewModel: ViewModel
     @State private var animateGradient: Bool = false
     private let startColor: Color = .blue
     private let middleColor: Color = .yellow
     private let endColor: Color = .green
     
+    
+    init(context: NSManagedObjectContext) {
+        self.viewContext = context
+        self.viewModel = ViewModel(context: context)
+    }
+        
     var body: some View {
         NavigationView {
             List(viewModel.videos) { video in
                 VideoItem(video: video)
                     .background(
-                        NavigationLink("", destination: VideoDetailView(video: video)).opacity(0)
+                        NavigationLink("", destination: VideoDetailView(context: viewContext, video: video))
+                            .buttonStyle(.plain)
+                            .opacity(0)
                     )
+                    .buttonStyle(.plain)
             } // List
             .listStyle(.insetGrouped)
             .navigationTitle("Videos")
@@ -40,7 +50,7 @@ struct ContentView: View {
                 do {
                     try await viewModel.getPopularVideos()
                 } catch {
-                    print("error", error.localizedDescription)
+                    debugPrint("error", error.localizedDescription)
                 }
             }
         } // Navigation
@@ -48,5 +58,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
+    ContentView(context: PersistenceController.shared.container.viewContext).environment(\.managedObjectContext, PersistenceController.shared.container.viewContext)
 }

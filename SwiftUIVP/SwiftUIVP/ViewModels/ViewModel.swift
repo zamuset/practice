@@ -5,9 +5,9 @@
 //  Created by Samuel Chavez on 17/06/24.
 //
 
-import Foundation
 import SwiftUI
 import Combine
+import CoreData
 
 enum APIErrorType: Error {
     case invalidURL
@@ -17,12 +17,21 @@ enum APIErrorType: Error {
     case dataNotFound
 }
 
-final class ViewModel: ObservableObject {
-    
+final class ViewModel: NSObject, ObservableObject, URLSessionDownloadDelegate {
     @Published var videoList: VideoList = VideoList(videos: [])
     @Published var videos: [Video] = []
     @Published var showError = false
     var cancellables = Set<AnyCancellable>()
+    
+    // Video download and persistence
+    var viewContext: NSManagedObjectContext
+    @Published var progress: Float = 0
+    private var videoName: String = ""
+    private var authorInfo: (user: String, description: String) = (user: "", description: "")
+    
+    init(context: NSManagedObjectContext) {
+        self.viewContext = context
+    }
     
     @MainActor
     func getPopularVideos() async throws {
@@ -52,3 +61,56 @@ final class ViewModel: ObservableObject {
         }
     }
 }
+
+// Video download and persistence
+extension ViewModel {
+    func downloadVideo(url: URL, authorInfo: (user: String, description: String)) {
+        videoName = url.lastPathComponent
+        let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
+        let task = session.dataTask(with: url) { (data, response, error) in
+            guard error == nil else {
+                return
+            }
+            let downloadTask = session.downloadTask(with: url)
+            downloadTask.resume()
+        }
+        task.resume()
+    }
+    
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        guard let data = try? Data(contentsOf: location) else {
+            return
+        }
+        
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let destinationURL = documentsURL.appendingPathComponent(videoName)
+        do {
+            try data.write(to: destinationURL)
+            storeVideo(at: destinationURL)
+        } catch {
+            debugPrint("Error saving file:", error)
+        }
+    }
+    
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        DispatchQueue.main.async {
+            self.progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+        }
+    }
+    
+    func storeVideo(at path: URL) {
+        let savedVideoEntity = SavedVideo(context: viewContext)
+        savedVideoEntity.id = UUID()
+        savedVideoEntity.localPath = path.absoluteString
+        savedVideoEntity.name = videoName
+        savedVideoEntity.author = authorInfo.user
+        savedVideoEntity.authorInfo = authorInfo.description
+        
+        do {
+            try viewContext.save()
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+    }
+}
+

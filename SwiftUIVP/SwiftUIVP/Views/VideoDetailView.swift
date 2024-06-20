@@ -7,21 +7,45 @@
 
 import SwiftUI
 import AVKit
+import CoreData
 
 struct VideoDetailView: View {
-    let video: Video
     @State var player = AVPlayer()
     @State var showFullScreen = false
-    @State var currentVideo: VideoFile = .testVideoFile
+    @State var currentPlayingVideo: VideoFile = .testVideoFile
+    @ObservedObject var viewModel: ViewModel
+    let video: Video
     
     @State var selection = 0
     
+    init(context: NSManagedObjectContext, video: Video) {
+        self.viewModel = ViewModel(context: context)
+        self.video = video
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
-            Text("This video ID is \(currentVideo.id)")
+            HStack {
+                
+            Text("This video ID is \(currentPlayingVideo.id)")
                 .foregroundStyle(.accent)
                 .font(.headline)
                 .padding(.horizontal, 8)
+                Spacer()
+                
+                Button(action: {
+                    viewModel.downloadVideo(
+                        url: currentPlayingVideo.link,
+                        authorInfo: (user: video.user.name, 
+                                     description: video.user.url.absoluteString)
+                    )
+                }, label: {
+                    Text("Download")
+                    Image(systemName: "square.and.arrow.down")
+                    
+                })
+            }
+            .padding(.horizontal, 8)
             
             videoView
                 .frame(height: 350)
@@ -44,11 +68,11 @@ struct VideoDetailView: View {
         }
         .fullScreenCover(isPresented: $showFullScreen, content: {
             videoView
-                .padding(.vertical, 10)
+                .ignoresSafeArea(.all)
         })
         .onAppear {
             if let sdVideo = video.videoFiles.first(where: { $0.quality == "sd" }) {
-                currentVideo = sdVideo
+                currentPlayingVideo = sdVideo
                 player = AVPlayer(url: sdVideo.link)
                 player.play()
             }
@@ -62,7 +86,7 @@ struct VideoDetailView: View {
                 HStack {
                     Spacer()
                     // Video quality label
-                    Text(currentVideo.quality.uppercased())
+                    Text(currentPlayingVideo.quality.uppercased())
                         .padding(.horizontal, 2)
                         .background(.white.opacity(0.5))
                         .foregroundStyle(.white)
@@ -86,7 +110,7 @@ struct VideoDetailView: View {
         .onAppear {
             // Unwrap the first standard definition video from the list
             if let sdVideo = video.videoFiles.first(where: { $0.quality == "sd" }) {
-                currentVideo = sdVideo
+                currentPlayingVideo = sdVideo
                 player = AVPlayer(url: sdVideo.link)
                 player.play()
             }
@@ -98,5 +122,7 @@ struct VideoDetailView: View {
 }
 
 #Preview {
-    VideoDetailView(video: Video.testVideo, currentVideo: VideoFile.testVideoFile)
+    let context = PersistenceController.shared.container.viewContext
+    return VideoDetailView(context: context, video: Video.testVideo)
+    
 }

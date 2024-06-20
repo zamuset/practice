@@ -32,9 +32,26 @@ struct VideoItem: View {
                     .foregroundStyle(.white)
                 
             }
+            // Save offline button
+//            .overlay(
+//                Button(action: {
+//                    // Implement download
+//                }, label: {
+//                    Image(systemName: "bookmark")
+//                        .foregroundStyle(.accent)
+//                }),
+//                alignment: .topTrailing
+//            )
+            // Duration text
             .overlay(
-                Text(video.duration.formatedDuration())
-                    .padding(.horizontal, 2)
+                HStack {
+                    Image(systemName: "clock")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 12)
+                    Text(video.duration.formatedDuration())
+                }
+                    .padding(.horizontal, 4)
                     .background(.black.opacity(0.5))
                     .foregroundStyle(.white)
                     .font(.footnote)
@@ -49,7 +66,7 @@ struct VideoItem: View {
                     .fontWeight(.heavy)
                     .foregroundStyle(Color.accentColor)
                 
-                Text("You can check my profile in the link below \n [\(video.user.url.lastPathComponent)](\(video.user.url.absoluteString))")
+                Text("You can check my profile in the link below\n[\(video.user.url.lastPathComponent)](\(video.user.url.absoluteString))")
                     .font(.subheadline)
                     .multilineTextAlignment(.leading)
                     .lineLimit(3, reservesSpace: true)

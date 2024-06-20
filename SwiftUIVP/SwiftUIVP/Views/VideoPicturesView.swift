@@ -24,7 +24,9 @@ struct VideoPicturesView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.white, lineWidth: 1))
                             
                         } placeholder: {
-                            ProgressView()
+                            Image(systemName: "photo.stack")
+                                .resizable()
+                                .scaledToFit()
                         }
                     }
                 }
@@ -40,5 +42,6 @@ struct VideoPicturesView: View {
 }
 
 #Preview {
-    VideoPicturesView(videoPictures: [])
+    let videoPictures: [VideoPicture] = Array(repeating: VideoPicture.testVideoPicture, count: 16)
+    return VideoPicturesView(videoPictures: videoPictures)
 }
