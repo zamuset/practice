@@ -17,10 +17,10 @@ struct MainView: View {
                 }
                 .tag(1)
             
-            EmptyView()
+            SavedVideosView(context: PersistenceController.shared.container.viewContext)
                 .tabItem {
                     Image(systemName: "square.and.arrow.down")
-                    Text("Downloaded Videos")
+                    Text("Saved Videos")
                 }
                 .tag(2)
         }

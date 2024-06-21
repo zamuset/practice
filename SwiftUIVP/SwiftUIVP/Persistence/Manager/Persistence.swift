@@ -26,6 +26,18 @@ struct PersistenceController {
         })
         container.viewContext.automaticallyMergesChangesFromParent = true
     }
+    
+    // MARK: - Core Data Saving support
+    func saveContext () {
+        if container.viewContext.hasChanges {
+            do {
+                try container.viewContext.save()
+            } catch {
+                let nserror = error as NSError
+                debugPrint("Unresolved error \(error), \(nserror.userInfo)")
+            }
+        }
+    }
 }
 
 extension NSPersistentStoreDescription {
@@ -33,7 +45,7 @@ extension NSPersistentStoreDescription {
         return self
             .url?
             .absoluteString
-            .replacingOccurrences(of: "%20", with: "\\ ")
+            .removingPercentEncoding
     }
 }
 

@@ -13,4 +13,14 @@ extension Int {
         if hours > 0 { return String(format: "%0.2d:%0.2d:%0.2d", hours, minutes, seconds) }
         return String(format: "%0.2d:%0.2d", minutes, seconds)
     }
+    
+    var toInt64: Int64 {
+        return Int64(self)
+    }
+}
+
+extension Int64 {
+    var toInt: Int {
+        return Int(self)
+    }
 }

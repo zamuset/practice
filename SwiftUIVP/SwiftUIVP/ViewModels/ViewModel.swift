@@ -29,7 +29,7 @@ final class ViewModel: NSObject, ObservableObject, URLSessionDownloadDelegate {
     @Published var progress: Float = 0
     @Published var totalSizeDownload: Float = 0
     private var videoToSave: VideoFile = .testVideoFile
-    private var authorInfo: (name: String, siteLink: String) = (name: "", siteLink: "")
+    private var extraInfo: VideoExtraInfo = .init()
     
     init(context: NSManagedObjectContext) {
         self.viewContext = context
@@ -64,10 +64,18 @@ final class ViewModel: NSObject, ObservableObject, URLSessionDownloadDelegate {
     }
 }
 
+struct VideoExtraInfo {
+    var name: String?
+    var imagePath: URL?
+    var siteLink: URL?
+    var duration: Int?
+}
+
 // Video download and persistence
 extension ViewModel {
-    func downloadVideo(_ video: VideoFile, authorInfo: (name: String, siteLink: String)) {
+    func downloadVideo(_ video: VideoFile, extraInfo: VideoExtraInfo) {
         videoToSave = video
+        self.extraInfo = extraInfo
         let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
         let task = session.dataTask(with: video.link) { (data, response, error) in
             guard error == nil else {
@@ -107,14 +115,28 @@ extension ViewModel {
         }
     }
     
+    @MainActor
+    func getStoredVideos() async throws {
+        let request = SavedVideo.fetchRequest()
+        
+        do {
+            let storedVideos = try viewContext.fetch(request)
+            videos = storedVideos.compactMap { $0.toVideo() }
+        } catch {
+            throw DBErrorType.entityNotFound
+        }
+    }
+    
     private func storeVideo(at path: URL) {
         let savedVideoEntity = SavedVideo(context: viewContext)
-        savedVideoEntity.id = "\(videoToSave.id)"
-        savedVideoEntity.localPath = path.absoluteString
-        savedVideoEntity.name = videoToSave.link.lastPathComponent
-        savedVideoEntity.author = authorInfo.name
-        savedVideoEntity.authorInfo = authorInfo.siteLink
-        
+        savedVideoEntity.id = videoToSave.id.toInt64
+        savedVideoEntity.imagePath = path
+        savedVideoEntity.videoName = videoToSave.link.lastPathComponent
+        savedVideoEntity.videoPath = path
+        savedVideoEntity.duration = extraInfo.duration?.toInt64 ?? 0
+        savedVideoEntity.authorName = extraInfo.name
+        savedVideoEntity.authorSite = extraInfo.siteLink
+                
         do {
             try viewContext.save()
         } catch {
@@ -122,9 +144,9 @@ extension ViewModel {
         }
     }
     
-    func removeVideo(with id: String) async throws {
+    func removeVideo(with id: Int64) async throws {
         let request = SavedVideo.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", id)
+        request.predicate = NSPredicate(format: "id == %d", id)
         
         do {
             if let videoToDelete = try viewContext.fetch(request).first {
@@ -138,15 +160,12 @@ extension ViewModel {
     }
     
     private func deleteStoredVideo(video: SavedVideo) async throws {
-        guard let fileLocation = URL(string: video.localPath ?? "") else {
+        guard let fileLocation = video.videoPath else {
             throw DBErrorType.unknown
         }
         
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let filePath = documentsURL.appendingPathComponent(fileLocation.lastPathComponent)
-        
         do {
-            try FileManager.default.removeItem(at: filePath)
+            try FileManager.default.removeItem(at: fileLocation)
         } catch {
             throw error
         }
