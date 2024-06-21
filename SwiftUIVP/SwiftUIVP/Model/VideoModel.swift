@@ -56,6 +56,10 @@ extension Video {
                         VideoPicture.testVideoPicture
                      ])
     }
+    
+    var fistStandardVideo: VideoFile {
+        return videoFiles.first(where: { $0.quality == "sd" }) ?? .testVideoFile
+    }
 }
 
 extension VideoFile {

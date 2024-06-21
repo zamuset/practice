@@ -27,9 +27,12 @@ struct VideoListView: View {
             List(viewModel.videos) { video in
                 VideoItem(video: video)
                     .background(
-                        NavigationLink("", destination: VideoDetailView(context: viewContext, video: video))
-                            .buttonStyle(.plain)
-                            .opacity(0)
+                        NavigationLink("", destination:
+                                        VideoDetailView(context: viewContext,
+                                                        video: video,
+                                                        currentPlaying: video.fistStandardVideo))
+                        .buttonStyle(.plain)
+                        .opacity(0)
                     )
                     .buttonStyle(.plain)
             } // List

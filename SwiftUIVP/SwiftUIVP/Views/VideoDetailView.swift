@@ -10,18 +10,17 @@ import AVKit
 import CoreData
 
 struct VideoDetailView: View {
-    @State var player = AVPlayer()
     @State var showFullScreen = false
-    @State var currentPlayingVideo: VideoFile = .testVideoFile
     @State var savedVideo: SavedVideo? = nil
     @ObservedObject var viewModel: ViewModel
-    let video: Video
-    
+    var video: Video = .testVideo
+    let currentPlayingVideo: VideoFile
     @State var selection = 0
     
-    init(context: NSManagedObjectContext, video: Video) {
+    init(context: NSManagedObjectContext, video: Video, currentPlaying: VideoFile) {
         self.viewModel = ViewModel(context: context)
         self.video = video
+        self.currentPlayingVideo = currentPlaying
     }
     
     var body: some View {
@@ -37,7 +36,7 @@ struct VideoDetailView: View {
                     if savedVideo != nil {
                         Button(action: {
                             Task {
-                                try await viewModel.removeVideo(with: savedVideo?.id ?? "")
+                                try await viewModel.removeVideo(with: savedVideo?.id ?? -1)
                             }
                         }, label: {
                             Text("Delete")
@@ -46,9 +45,12 @@ struct VideoDetailView: View {
                         .foregroundStyle(.red)
                     } else {
                         Button(action: {
-                            viewModel.downloadVideo(currentPlayingVideo,
-                                                    authorInfo: (name: video.user.name,
-                                                                 siteLink: video.user.url.absoluteString)
+                            viewModel.downloadVideo(
+                                currentPlayingVideo,
+                                extraInfo: .init(name: video.user.name,
+                                                 imagePath: video.image,
+                                                 siteLink: video.user.url,
+                                                 duration: video.duration)
                             )
                         }, label: {
                             Text("Download")
@@ -59,7 +61,8 @@ struct VideoDetailView: View {
                 }
                 .padding(.horizontal, 8)
                 
-                videoView
+                VideoPlayerView(currentPlayingVideo: currentPlayingVideo,
+                                action: { value in showFullScreen = value })
                     .frame(height: 350)
                 
                 Picker(selection: $selection, label: Text("Test")) {
@@ -78,7 +81,8 @@ struct VideoDetailView: View {
                 Spacer()
             }
             .fullScreenCover(isPresented: $showFullScreen, content: {
-                videoView
+                VideoPlayerView(currentPlayingVideo: currentPlayingVideo,
+                                action: { value in showFullScreen = value })
                     .ignoresSafeArea(.all)
             })
             
@@ -87,61 +91,10 @@ struct VideoDetailView: View {
             }
         }
     }
-    
-    @ViewBuilder
-    private var videoView: some View {
-        VideoPlayer(player: player) {
-            VStack {
-                HStack {
-                    Spacer()
-                    // Video quality label
-                    Text(currentPlayingVideo.quality.uppercased())
-                        .padding(.horizontal, 2)
-                        .background(.white.opacity(0.5))
-                        .foregroundStyle(.white)
-                        .font(.system(.footnote, design: .rounded))
-                        .fontWeight(.heavy)
-                    // Full Screen toogle button
-                    let imageName = showFullScreen ?
-                        "arrow.down.right.and.arrow.up.left" :
-                        "arrow.up.left.and.arrow.down.right"
-                    Image(systemName: imageName)
-                        .padding(16)
-                        .foregroundStyle(.white)
-                        .tint(.white)
-                        .onTapGesture {
-                            showFullScreen.toggle()
-                        }
-                }
-                Spacer()
-            }
-        }
-        .onAppear {
-            // Unwrap the first standard definition video from the list
-            if let sdVideo = video.videoFiles.first(where: { $0.quality == "sd" }) {
-                currentPlayingVideo = sdVideo
-                player = AVPlayer(url: sdVideo.link)
-                player.play()
-            }
-            
-        }
-        .onDisappear {
-            player.pause()
-        }
-        .task {
-            if let sdVideo = video.videoFiles.first(where: { $0.quality == "sd" }) {
-                do {
-                    savedVideo = try await viewModel.checkIfVideoExist(with: "\(sdVideo.id)")
-                } catch {
-                    debugPrint(error.localizedDescription)
-                }
-            }
-        }
-    }
 }
 
 #Preview {
     let context = PersistenceController.shared.container.viewContext
-    return VideoDetailView(context: context, video: Video.testVideo)
+    return VideoDetailView(context: context, video: Video.testVideo, currentPlaying: .testVideoFile)
     
 }
