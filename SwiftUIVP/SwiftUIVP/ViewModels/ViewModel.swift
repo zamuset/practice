@@ -25,6 +25,7 @@ final class ViewModel: NSObject, ObservableObject, URLSessionDownloadDelegate {
     
     // Video download and persistence
     var viewContext: NSManagedObjectContext
+    @Published var savedVideo: SavedVideo? = nil
     @Published var isDownloading: Bool = false
     @Published var progress: Float = 0
     @Published var totalSizeDownload: Float = 0
@@ -64,15 +65,9 @@ final class ViewModel: NSObject, ObservableObject, URLSessionDownloadDelegate {
     }
 }
 
-struct VideoExtraInfo {
-    var name: String?
-    var imagePath: URL?
-    var siteLink: URL?
-    var duration: Int?
-}
-
 // Video download and persistence
 extension ViewModel {
+    @MainActor
     func downloadVideo(_ video: VideoFile, extraInfo: VideoExtraInfo) {
         videoToSave = video
         self.extraInfo = extraInfo
@@ -139,12 +134,17 @@ extension ViewModel {
                 
         do {
             try viewContext.save()
+            Task {
+                try? await checkIfStored(video: videoToSave.id.toInt64)
+            }
         } catch {
             debugPrint(error.localizedDescription)
         }
     }
     
-    func removeVideo(with id: Int64) async throws {
+    @MainActor
+    func removeVideo() async throws {
+        let id = savedVideo?.id ?? -1
         let request = SavedVideo.fetchRequest()
         request.predicate = NSPredicate(format: "id == %d", id)
         
@@ -153,9 +153,10 @@ extension ViewModel {
                 try await deleteStoredVideo(video: videoToDelete)
                 viewContext.delete(videoToDelete)
                 try viewContext.save()
+                savedVideo = nil
             }
         } catch {
-            throw DBErrorType.entityNotFound
+            throw error
         }
     }
     
@@ -171,15 +172,15 @@ extension ViewModel {
         }
     }
     
-    func checkIfVideoExist(with id: String) async throws -> SavedVideo? {
+    @MainActor
+    func checkIfStored(video id: Int64) async throws {
         let request = SavedVideo.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", id)
+        request.predicate = NSPredicate(format: "id == %d", id)
         
         do {
-            guard let searchedVideo = try viewContext.fetch(request).first else {
-                return nil
+            if let searchedVideo = try viewContext.fetch(request).first {
+                savedVideo = searchedVideo
             }
-            return searchedVideo
         } catch {
             throw DBErrorType.entityNotFound
         }

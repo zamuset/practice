@@ -32,6 +32,7 @@
 		F8DFA3682C25177E008DC4C8 /* SavedVideo+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DFA3662C25177E008DC4C8 /* SavedVideo+CoreDataClass.swift */; };
 		F8DFA3692C25177E008DC4C8 /* SavedVideo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DFA3672C25177E008DC4C8 /* SavedVideo+CoreDataProperties.swift */; };
 		F8DFA36B2C251ED7008DC4C8 /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DFA36A2C251ED7008DC4C8 /* VideoPlayerView.swift */; };
+		F8DFA36D2C25317A008DC4C8 /* VideoExtraInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DFA36C2C25317A008DC4C8 /* VideoExtraInfo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +82,7 @@
 		F8DFA3662C25177E008DC4C8 /* SavedVideo+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedVideo+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F8DFA3672C25177E008DC4C8 /* SavedVideo+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SavedVideo+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F8DFA36A2C251ED7008DC4C8 /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
+		F8DFA36C2C25317A008DC4C8 /* VideoExtraInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoExtraInfo.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +244,7 @@
 			isa = PBXGroup;
 			children = (
 				F8818A692C21523A0057B58B /* ViewModel.swift */,
+				F8DFA36C2C25317A008DC4C8 /* VideoExtraInfo.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -402,6 +405,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F8981FD52C21084E002B85D8 /* VideoItem.swift in Sources */,
+				F8DFA36D2C25317A008DC4C8 /* VideoExtraInfo.swift in Sources */,
 				F8818A6A2C21523A0057B58B /* ViewModel.swift in Sources */,
 				F8DFA3552C23FF4A008DC4C8 /* VideoListView.swift in Sources */,
 				F8DFA3512C23FD83008DC4C8 /* LoaderView.swift in Sources */,

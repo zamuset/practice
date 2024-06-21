@@ -11,7 +11,7 @@ import CoreData
 
 struct VideoDetailView: View {
     @State var showFullScreen = false
-    @State var savedVideo: SavedVideo? = nil
+//    @State var savedVideo: SavedVideo? = nil
     @ObservedObject var viewModel: ViewModel
     var video: Video = .testVideo
     let currentPlayingVideo: VideoFile
@@ -33,31 +33,30 @@ struct VideoDetailView: View {
                         .padding(.horizontal, 12)
                     Spacer()
                     
-                    if savedVideo != nil {
-                        Button(action: {
+                    Button(action: {
+                        if viewModel.savedVideo != nil {
                             Task {
-                                try await viewModel.removeVideo(with: savedVideo?.id ?? -1)
+                                try await viewModel.removeVideo()
                             }
-                        }, label: {
-                            Text("Delete")
-                            Image(systemName: "trash")
-                        })
-                        .foregroundStyle(.red)
-                    } else {
-                        Button(action: {
+                        } else {
                             viewModel.downloadVideo(
                                 currentPlayingVideo,
                                 extraInfo: .init(name: video.user.name,
                                                  imagePath: video.image,
                                                  siteLink: video.user.url,
-                                                 duration: video.duration)
-                            )
-                        }, label: {
+                                                 duration: video.duration))
+                        }
+                    }, label: {
+                        if viewModel.savedVideo != nil {
+                            Text("Delete")
+                            Image(systemName: "trash")
+                        } else {
                             Text("Download")
                             Image(systemName: "square.and.arrow.down")
-                            
-                        })
-                    }
+                        }
+                        
+                    })
+                    .foregroundStyle(viewModel.savedVideo != nil ? .red : .green)
                 }
                 .padding(.horizontal, 8)
                 
@@ -85,12 +84,23 @@ struct VideoDetailView: View {
                                 action: { value in showFullScreen = value })
                     .ignoresSafeArea(.all)
             })
+            .task {
+                try? await viewModel.checkIfStored(video: currentPlayingVideo.id.toInt64)
+            }
             
             if viewModel.isDownloading {
                 LoaderView()
             }
         }
     }
+    
+//    private func getSavedVideo() async throws {
+//        do {
+//            savedVideo = try await viewModel.checkIfVideoExist(with: currentPlayingVideo.id.toInt64)
+//        } catch {
+//            debugPrint(error.localizedDescription)
+//        }
+//    }
 }
 
 #Preview {
