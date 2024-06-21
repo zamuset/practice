@@ -6,4 +6,4 @@ Simple Video Player made with SwiftUI and Combine
 - Download and store videos locally :download
 - Play downloaded videos without Internet required
 
-[First Version with all functionality](SwiftUIVP/DemoVideos/RPReplay_Final1718998391.MP4)
+![First Version with all functionality](SwiftUIVP/DemoVideos/RPReplay_Final1718998391.MP4)
