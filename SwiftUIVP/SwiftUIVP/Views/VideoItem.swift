@@ -9,21 +9,29 @@ import SwiftUI
 
 struct VideoItem: View {
     let video: Video
+    @State var image: UIImage?
     
     var body: some View {
         VStack(spacing: 10) {
             ZStack {
-                AsyncImage(url: video.image) { image in
-                    image
+                if let image = image {
+                    Image(uiImage: image)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                    
-                } placeholder: {
-                    ProgressView()
+                        .frame(maxWidth: 400, maxHeight: 100)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                } else {
+                    AsyncImage(url: video.image) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                        
+                    } placeholder: {
+                        ProgressView()
+                    }
+                    .frame(maxWidth: 400, maxHeight: 100)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
-                .frame(maxWidth: 400, maxHeight: 100)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                
                 Image(systemName: "play.circle")
                     .resizable()
                     .scaledToFit()

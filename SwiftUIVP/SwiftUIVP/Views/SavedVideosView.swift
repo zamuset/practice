@@ -18,27 +18,29 @@ struct SavedVideosView: View {
     }
     
     var body: some View {
-        List(viewModel.videos) { video in
-            VideoItem(video: video)
-                .background(
-                    NavigationLink("", destination:
-                                    VideoDetailView(context: viewContext,
-                                                    video: video,
-                                                    currentPlaying: video.fistStandardVideo))
-                    .buttonStyle(.plain)
-                    .opacity(0)
-                )
-                .buttonStyle(.plain)
-        } // List
-        
-        .listStyle(.insetGrouped)
-        .navigationTitle("Saved videos")
-        .scrollContentBackground(.hidden)
-        .task {
-            do {
-                try await viewModel.getStoredVideos()
-            } catch {
-                debugPrint("error", error.localizedDescription)
+        NavigationView {
+            List(viewModel.videos) { video in
+                VideoItem(video: video, image: viewModel.loadImage(from: video.image))
+                    .background(
+                        NavigationLink("", destination:
+                                        VideoDetailView(context: viewContext,
+                                                        video: video,
+                                                        currentPlaying: video.fistStandardVideo,
+                                                        playLocalVideo: true))
+                        .buttonStyle(.plain)
+                        .opacity(0)
+                    )
+            } // List
+            
+            .listStyle(.insetGrouped)
+            .navigationTitle("Saved videos")
+            .scrollContentBackground(.hidden)
+            .task {
+                do {
+                    try await viewModel.getStoredVideos()
+                } catch {
+                    debugPrint("error", error.localizedDescription)
+                }
             }
         }
     }

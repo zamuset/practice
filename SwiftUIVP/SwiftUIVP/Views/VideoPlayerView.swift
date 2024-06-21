@@ -12,7 +12,8 @@ struct VideoPlayerView: View {
     @State var player = AVPlayer()
     @State var currentPlayingVideo: VideoFile
     @State var showFullScreen = false
-    let action: (Bool) -> Void
+    var playLocalVideo: Bool
+    let action: ((Bool) -> Void)?
     
     var body: some View {
         VideoPlayer(player: player) {
@@ -33,7 +34,7 @@ struct VideoPlayerView: View {
                         .tint(.white)
                         .onTapGesture {
                             showFullScreen.toggle()
-                            action(showFullScreen)
+                            action?(showFullScreen)
                         }
                 }
                 Spacer()
@@ -41,16 +42,28 @@ struct VideoPlayerView: View {
         }
         .onAppear {
             Task {
-                player = AVPlayer(url: currentPlayingVideo.link)
-                player.play()
+                if playLocalVideo {
+                    player = AVPlayer(url: getLocalPath(for: currentPlayingVideo))
+                    player.play()
+                    
+                } else {
+                    player = AVPlayer(url: currentPlayingVideo.link)
+                    player.play()
+                }
             }
         }
         .onDisappear {
             player.pause()
         }
     }
+    
+     private func getLocalPath(for video: VideoFile) -> URL {
+        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let videoPath = documentsPath.appendingPathComponent(video.link.lastPathComponent)
+        return videoPath
+    }
 }
 
 #Preview {
-    VideoPlayerView(currentPlayingVideo: .testVideoFile, action: { _ in })
+    VideoPlayerView(currentPlayingVideo: .testVideoFile, playLocalVideo: false, action: { _ in })
 }

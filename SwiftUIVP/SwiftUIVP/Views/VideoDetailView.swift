@@ -11,16 +11,18 @@ import CoreData
 
 struct VideoDetailView: View {
     @State var showFullScreen = false
-//    @State var savedVideo: SavedVideo? = nil
     @ObservedObject var viewModel: ViewModel
     var video: Video = .testVideo
     let currentPlayingVideo: VideoFile
+    var playLocalVideo: Bool
     @State var selection = 0
     
-    init(context: NSManagedObjectContext, video: Video, currentPlaying: VideoFile) {
+    init(context: NSManagedObjectContext, video: Video, 
+         currentPlaying: VideoFile, playLocalVideo: Bool) {
         self.viewModel = ViewModel(context: context)
         self.video = video
         self.currentPlayingVideo = currentPlaying
+        self.playLocalVideo = playLocalVideo
     }
     
     var body: some View {
@@ -61,6 +63,7 @@ struct VideoDetailView: View {
                 .padding(.horizontal, 8)
                 
                 VideoPlayerView(currentPlayingVideo: currentPlayingVideo,
+                                playLocalVideo: playLocalVideo,
                                 action: { value in showFullScreen = value })
                     .frame(height: 350)
                 
@@ -81,6 +84,7 @@ struct VideoDetailView: View {
             }
             .fullScreenCover(isPresented: $showFullScreen, content: {
                 VideoPlayerView(currentPlayingVideo: currentPlayingVideo,
+                                playLocalVideo: playLocalVideo,
                                 action: { value in showFullScreen = value })
                     .ignoresSafeArea(.all)
             })
@@ -93,18 +97,10 @@ struct VideoDetailView: View {
             }
         }
     }
-    
-//    private func getSavedVideo() async throws {
-//        do {
-//            savedVideo = try await viewModel.checkIfVideoExist(with: currentPlayingVideo.id.toInt64)
-//        } catch {
-//            debugPrint(error.localizedDescription)
-//        }
-//    }
 }
 
 #Preview {
     let context = PersistenceController.shared.container.viewContext
-    return VideoDetailView(context: context, video: Video.testVideo, currentPlaying: .testVideoFile)
+    return VideoDetailView(context: context, video: Video.testVideo, currentPlaying: .testVideoFile, playLocalVideo: false)
     
 }

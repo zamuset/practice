@@ -71,6 +71,7 @@ extension ViewModel {
     func downloadVideo(_ video: VideoFile, extraInfo: VideoExtraInfo) {
         videoToSave = video
         self.extraInfo = extraInfo
+        downloadImage(from: extraInfo.imagePath)
         let session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
         let task = session.dataTask(with: video.link) { (data, response, error) in
             guard error == nil else {
@@ -83,6 +84,31 @@ extension ViewModel {
             downloadTask.resume()
         }
         task.resume()
+    }
+    
+    func downloadImage(from url: URL?) {
+        Task {
+            guard let url = url else { return }
+            let (data, _) = try await URLSession.shared.data(from: url)
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let destinationURL = documentsURL.appendingPathComponent(url.lastPathComponent)
+            
+            if FileManager.default.createFile(atPath: destinationURL.path(), contents: data) {
+                extraInfo.imagePath = destinationURL
+            }
+        }
+    }
+    
+    func loadImage(from path: URL) -> UIImage? {
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let fileURL = documentsURL.appendingPathComponent(path.lastPathComponent)
+        do {
+            let imageData = try Data(contentsOf: fileURL)
+            return UIImage(data: imageData)
+        } catch {
+            print("Error loading image : \(error)")
+        }
+        return nil
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
@@ -125,7 +151,7 @@ extension ViewModel {
     private func storeVideo(at path: URL) {
         let savedVideoEntity = SavedVideo(context: viewContext)
         savedVideoEntity.id = videoToSave.id.toInt64
-        savedVideoEntity.imagePath = path
+        savedVideoEntity.imagePath = extraInfo.imagePath
         savedVideoEntity.videoName = videoToSave.link.lastPathComponent
         savedVideoEntity.videoPath = path
         savedVideoEntity.duration = extraInfo.duration?.toInt64 ?? 0

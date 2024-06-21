@@ -40,7 +40,7 @@ extension SavedVideo : Identifiable {
                      image: imagePath,
                      duration: duration.toInt,
                      user: .init(id: 0, name: authorName ?? "", url: authorSite),
-                     videoFiles: [],
+                     videoFiles: [.init(id: id.toInt, quality: "sd", fileType: "", width: nil, height: nil, link: videoPath)],
                      videoPictures: [])
     }
 }

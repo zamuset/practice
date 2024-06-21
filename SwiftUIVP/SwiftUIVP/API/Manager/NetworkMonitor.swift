@@ -30,8 +30,8 @@ final class NetworkMonitor {
             self?.isOfflineMode = false
             self?.currentConnectionType = NWInterface.InterfaceType.allCases.filter { path.usesInterfaceType($0) }.first
             
-            DispatchQueue.main.async {                
-                NotificationCenter.default.post(name: .connectivityStatus, object: nil)
+            DispatchQueue.main.async { [weak self] in
+                NotificationCenter.default.post(name: .connectivityStatus, object: self?.isConnected)
             }
         }
         monitor.start(queue: queue)

@@ -30,25 +30,15 @@ struct VideoListView: View {
                         NavigationLink("", destination:
                                         VideoDetailView(context: viewContext,
                                                         video: video,
-                                                        currentPlaying: video.fistStandardVideo))
+                                                        currentPlaying: video.fistStandardVideo,
+                                                        playLocalVideo: false))
                         .buttonStyle(.plain)
                         .opacity(0)
                     )
-                    .buttonStyle(.plain)
             } // List
             .listStyle(.insetGrouped)
             .navigationTitle("Videos")
             .scrollContentBackground(.hidden)
-            .background {
-                LinearGradient(colors: [startColor, middleColor, endColor], startPoint: .topLeading, endPoint: .bottomTrailing)
-                    .ignoresSafeArea(.all)
-                    .hueRotation(.degrees(animateGradient ? 45 : 0))
-                    .onAppear {
-                        withAnimation(.easeInOut(duration: 3).repeatForever(autoreverses: true)) {
-                            animateGradient.toggle()
-                        }
-                    }
-            }
             .task {
                 do {
                     try await viewModel.getPopularVideos()
