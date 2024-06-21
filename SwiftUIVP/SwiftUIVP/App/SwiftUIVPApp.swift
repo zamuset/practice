@@ -9,6 +9,8 @@ import SwiftUI
 
 @main
 struct SwiftUIVPApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     var body: some Scene {
         WindowGroup {
             MainView()
