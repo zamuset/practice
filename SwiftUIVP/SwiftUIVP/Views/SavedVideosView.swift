@@ -11,6 +11,7 @@ import CoreData
 struct SavedVideosView: View {
     private var viewContext: NSManagedObjectContext
     @ObservedObject var viewModel: ViewModel
+    @EnvironmentObject var sharedStatus: SharedStatus
     
     init(context: NSManagedObjectContext) {
         self.viewContext = context
@@ -42,10 +43,18 @@ struct SavedVideosView: View {
                     debugPrint("error", error.localizedDescription)
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    let imageName = sharedStatus.isOnline ? "wifi" : "wifi.slash"
+                    Image(systemName: imageName)
+                        .foregroundStyle(sharedStatus.isOnline ? .accent : .red)
+                }
+            }
         }
     }
 }
 
 #Preview {
     SavedVideosView(context: PersistenceController.shared.container.viewContext)
+        .environmentObject(SharedStatus())
 }

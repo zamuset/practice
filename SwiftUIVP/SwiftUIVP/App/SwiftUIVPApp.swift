@@ -14,6 +14,7 @@ struct SwiftUIVPApp: App {
     var body: some Scene {
         WindowGroup {
             MainView()
+                .environmentObject(SharedStatus())
         }
     }
 }

@@ -10,12 +10,8 @@ import CoreData
 
 struct VideoListView: View {
     private var viewContext: NSManagedObjectContext
+    @EnvironmentObject var sharedStatus: SharedStatus
     @ObservedObject var viewModel: ViewModel
-    @State private var animateGradient: Bool = false
-    private let startColor: Color = .blue
-    private let middleColor: Color = .yellow
-    private let endColor: Color = .green
-    
     
     init(context: NSManagedObjectContext) {
         self.viewContext = context
@@ -46,10 +42,18 @@ struct VideoListView: View {
                     debugPrint("error", error.localizedDescription)
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    let imageName = sharedStatus.isOnline ? "wifi" : "wifi.slash"
+                    Image(systemName: imageName)
+                        .foregroundStyle(sharedStatus.isOnline ? .accent : .red)
+                }
+            }
         } // Navigation
     }
 }
 
 #Preview {
     VideoListView(context: PersistenceController.shared.container.viewContext)
+        .environmentObject(SharedStatus())
 }

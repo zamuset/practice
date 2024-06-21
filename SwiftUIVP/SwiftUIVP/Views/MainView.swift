@@ -9,12 +9,12 @@ import SwiftUI
 
 struct MainView: View {
     
-    @State var showOnlineVideos = true
-    
+    @EnvironmentObject var sharedStatus: SharedStatus
+    let viewContext = PersistenceController.shared.container.viewContext
     var body: some View {
         TabView {
-            if showOnlineVideos {
-                VideoListView(context: PersistenceController.shared.container.viewContext)
+            if sharedStatus.isOnline {
+                VideoListView(context: viewContext)
                     .tabItem {
                         Image(systemName: "video")
                         Text("Videos")
@@ -22,7 +22,7 @@ struct MainView: View {
                     .tag(1)
             }
             
-            SavedVideosView(context: PersistenceController.shared.container.viewContext)
+            SavedVideosView(context: viewContext)
                 .tabItem {
                     Image(systemName: "square.and.arrow.down")
                     Text("Saved Videos")
@@ -32,7 +32,7 @@ struct MainView: View {
         .onReceive(NotificationCenter.default.publisher(for: .connectivityStatus),
                    perform: { notification in
             if let isConnected = notification.object as? Bool {
-                showOnlineVideos = isConnected
+                sharedStatus.isOnline = isConnected
             }
         })
     }
@@ -40,4 +40,5 @@ struct MainView: View {
 
 #Preview {
     MainView()
+        .environmentObject(SharedStatus())
 }
