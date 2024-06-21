@@ -18,15 +18,12 @@ struct VideoPicturesView: View {
                     ForEach(videoPictures) { item in
                         AsyncImage(url: item.picture) { image in
                             image
-                                .resizable()
-                                .scaledToFit()
+                                .imageModifier()
                                 .clipShape(RoundedRectangle(cornerRadius: 5))
-                                .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.white, lineWidth: 1))
                             
                         } placeholder: {
                             Image(systemName: "photo.stack")
-                                .resizable()
-                                .scaledToFit()
+                                .imageModifier()
                         }
                     }
                 }
